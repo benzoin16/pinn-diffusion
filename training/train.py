@@ -7,7 +7,7 @@ import torch.nn as nn
 
 from src.model import *
 from src.losses import *
-from src.exact_solution import *
+from src.exact_soln import *
 
 torch.manual_seed(123)
 
