@@ -40,7 +40,7 @@ optimiser = torch.optim.Adam(pinn.parameters(),lr=1e-3)
 losses = []
 x_plot = torch.linspace(-1,1,1000).view(-1,1)
 t_plot = torch.ones_like(x_plot)*0.5
-C_true =  Q/torch.sqrt(4*np.pi*D*t_plot) * torch.exp(-x_plot**2/(4*D*t_plot))
+C_true =  exact_solution(x_plot, t_plot, D, Q)
 
 for i in range(1001):
     optimiser.zero_grad()
