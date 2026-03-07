@@ -41,6 +41,7 @@ losses = []
 x_plot = torch.linspace(-1,1,1000).view(-1,1)
 t_plot = torch.ones_like(x_plot)*0.5
 C_true =  exact_solution(x_plot, t_plot, D, Q)
+best_loss = float(inf)
 
 for i in range(1001):
     optimiser.zero_grad()
@@ -53,9 +54,24 @@ for i in range(1001):
     loss = l_pde + l_ic + l_bc + l_mass
     loss.backward()
     optimiser.step()
-    if i % 10 == 0:
-        with torch.no_grad():
+    with torch.no_grad():
             C_pred = pinn(x_plot,t_plot)
+    loss = abs(C_pred - C_true).mean()
+
+    if loss.item() < best_loss:
+        best_loss = loss.item()
+        torch.save({
+            "iteration": i,
+            "model_state_dict": pinn.state_dict(),
+            "optimiser_state_dict": optimiser.state_dict(),
+            "loss": best_loss
+        },
+        "experiments/checkpoints/best_model.pt")
+        
+    if i % 10 == 0: 
         frames.append(C_pred)
-        losses.append(abs(C_pred - C_true).mean())
+        losses.append(loss)
+
+np.save("experiments/frames.npy", np.array(frames))
+np.save("experiments/losses.npy", np.array(losses))
         
